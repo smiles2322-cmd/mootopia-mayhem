@@ -1,6 +1,6 @@
 # Moo-topia Mayhem
 
-Fight your way through a glowing night jungle overrun by rude party cows.
+Fight your way through a glowing night jungle overrun by rude party cows. Loot gear, collect Glitter, and follow the built-in guide to create your own Glitter token on Solana.
 
 Play: https://smiles2322-cmd.github.io/mootopia-mayhem/
 
