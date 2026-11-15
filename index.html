@@ -1,0 +1,168 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Moo-topia Mayhem</title>
+<meta name="description" content="A stylized 3D action brawler: slip through a secret rainbow portal into a glowing night jungle and put down a herd of very rude party cows.">
+<meta name="theme-color" content="#0b0a24">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Moo-topia">
+<link rel="manifest" href="./manifest.webmanifest">
+<link rel="icon" href="./icons/icon-192.png">
+<link rel="apple-touch-icon" href="./icons/apple-touch-icon.png">
+<link rel="stylesheet" href="./style.css">
+</head>
+<body>
+<canvas id="game" aria-label="Moo-topia Mayhem game world" role="img"></canvas>
+<div id="sr" class="vh" aria-live="polite" role="status"></div>
+<div id="hurt" aria-hidden="true"></div>
+<div id="flash" aria-hidden="true"></div>
+
+<!-- HUD -->
+<div id="hud" hidden>
+  <div class="hud-top">
+    <div class="hud-left">
+      <div class="hprow"><div id="lvlBadge" role="img" aria-label="Level 1">Lv 1</div>
+      <div id="hpbar" role="meter" aria-label="Health" aria-valuemin="0" aria-valuemax="100" aria-valuenow="100"><div id="hpFill"></div><span>HP <b id="hpTxt">100</b></span></div></div>
+      <div id="manabar" role="meter" aria-label="Mana" aria-valuemin="0" aria-valuemax="100" aria-valuenow="100"><div id="manaFill"></div><span>MP <b id="manaTxt">100</b></span></div>
+      <div id="xpbar" aria-hidden="true"><div id="xpFill"></div></div>
+      <div id="buffs" role="list" aria-label="Active buffs"></div>
+      <div id="areaName"></div>
+    </div>
+    <div class="hud-right">
+      <div id="glitterBox" role="group" aria-label="Glitter"><img class="coin" src="img/glitter_64.png" alt="" width="22" height="22"><b id="glitterVal">0</b></div>
+      <div class="scorebox"><small>Score</small> <b id="score">0</b></div>
+      <button id="btnBag" class="iconbtn" aria-label="Gear and bag">Bag</button>
+      <button id="btnPause" class="iconbtn" aria-label="Pause">II</button>
+    </div>
+  </div>
+  <div id="objective" aria-live="off"></div>
+  <div id="bossbar" hidden><div id="bossName"></div><div class="track"><div id="bossFill"></div></div></div>
+  <div id="combo" hidden aria-hidden="true">x2 COMBO</div>
+  <div id="quip" aria-hidden="true"></div>
+  <button id="btnPotion" class="hudbtn" aria-label="Drink potion"><span class="pot" aria-hidden="true"></span><b>0</b></button>
+  <button id="btnPickup" hidden></button>
+  <div id="spellbar" role="group" aria-label="Spells"></div>
+  <div id="lvlup" aria-hidden="true"></div>
+</div>
+
+<!-- touch controls -->
+<div id="touch" hidden>
+  <div id="stick" aria-hidden="true"><div id="knob"></div></div>
+  <div class="stickhint" aria-hidden="true">Drag left side to move · drag right side to look</div>
+  <div class="btns">
+    <button id="btnScan" class="tbtn small blvonly" aria-label="Scan surroundings">Scan</button>
+    <button id="btnSwap" class="tbtn small" aria-label="Switch weapon">Swap</button>
+    <button id="btnDash" class="tbtn" aria-label="Dash">Dash</button>
+    <button id="btnJump" class="tbtn" aria-label="Jump">Jump</button>
+    <button id="btnAtk" class="tbtn big" aria-label="Attack">Hit</button>
+  </div>
+</div>
+
+<!-- screens -->
+<section id="title" class="screen" aria-labelledby="logo">
+  <div class="art" aria-hidden="true"></div>
+  <div class="logowrap"><h1 id="logo"><span>Moo-topia</span><em>Mayhem</em></h1>
+    <p class="tag">The herd is unhinged. You are the cleanup crew.</p></div>
+  <div class="titlewrap">
+    <div class="diff" role="group" aria-label="Difficulty">
+      <button data-diff="normal">Normal</button><button data-diff="hard">Hard</button><button data-diff="nightmare">Nightmare</button>
+    </div>
+    <div class="menu">
+      <button id="btnStory" class="primary" data-autofocus>Story</button>
+      <button id="btnStampede">Stampede <small id="stampedeBest"></small></button>
+      <div class="row2"><button id="btnShop"><span class="gem" aria-hidden="true"></span> Glitter Shop</button><button id="btnTitleBag">Gear &amp; Bag</button></div>
+      <div class="row2"><button id="btnTitleToken" class="tokenbtn"><img src="img/glitter_64.png" alt="" width="24" height="24"> Glitter Token</button><button id="btnTitleWallet" class="walletbtn">Wallet</button></div>
+      <div class="row2"><button id="btnSettings">Settings</button><button id="btnHow">How to Play</button></div>
+    </div>
+    <p id="titleLinked" class="fine linkedline" hidden></p>
+    <p class="fine">Smiles 2322 · No ads · No accounts · No purchases</p>
+  </div>
+</section>
+
+<section id="areas" class="screen panel" hidden aria-labelledby="areasH">
+  <h2 id="areasH">Story</h2>
+  <p>Rook Vale slips through a secret portal into Moo-topia, a floating night jungle run by the rudest party cows alive.</p>
+  <div id="areaList"></div>
+  <button data-back="title">Back</button>
+</section>
+
+<section id="how" class="screen panel" hidden aria-labelledby="howH">
+  <h2 id="howH">How to Play</h2>
+  <ul>
+    <li><b>Phone:</b> drag the left side to move, drag the right side to look. Tap <b>Hit</b>, <b>Jump</b> (tap again in the air to double jump) and <b>Dash</b> (you can't be hit mid-dash).</li>
+    <li><b>Keyboard:</b> WASD or arrows to move, Space to jump, J or click to attack, K or Shift to dash, Q and E to turn the camera, 1, 2 and 3 to switch weapons, 4, 5, 6 and 7 to cast spells, Esc to pause, R to scan.</li>
+    <li><b>Weapons:</b> Energy Blade (fast 3-hit chain), Glow Spear (long reach, heavy thrust), Moonstaff (wide sweeps and a spinning finisher that sends cows flying).</li>
+    <li><b>Cows fight back.</b> When their spots glow orange and they paw the ground, a charge is coming. Dash sideways, then punish them while they're dizzy.</li>
+    <li>Knock cows into the glowing <b>corral</b> to impound them, or off a cliff for a Yeet bonus.</li>
+    <li>Pink clouds bounce you high. Rainbow bridges connect the islands.</li>
+    <li>Collect <b>Glow Milk</b> to heal, <b>stars</b> for points, and <b>Glitter</b> from cows, combos, bosses and hidden sparkle caches. Spend Glitter in the shop on looks. Shop items never affect stats.</li>
+    <li><b>Loot:</b> cows drop gear in five rarities, shown by beam color: Common (white), Uncommon (green), Rare (blue), Epic (purple) and Legendary (gold). Walk up and tap <b>Pick up</b> (or press F). Bosses always drop Epic or better. Open <b>Bag</b> (or press I) to compare and equip gear, sell junk for Glitter, and brew potions from crafting bits. Drink a potion with the potion button or H.</li>
+    <li><b>Ultra Rare:</b> a sixth tier above Legendary with a rainbow beam and its own sound. Any cow has a tiny chance to drop one. King Cudsworth has a much better chance. Glitter find gear raises the odds.</li>
+    <li><b>Levels:</b> every cow you bonk gives XP. Level up for more health, damage and mana, plus a talent point to spend in the Bag. Better gear needs a higher level.</li>
+    <li><b>Spells:</b> tap the spell buttons (or press 4 to 7). Glow Milk Mend heals, Moonbeam Stampede blasts everything nearby, Cowbell Courage boosts damage and armor, Udder Thunder chains lightning. Spells use mana, which refills over time, and unlock as you level up.</li>
+    <li><b>Buffs:</b> tonics, glowing shrines and spells give timed buffs. Their icons and timers sit under your health bar.</li>
+    <li><b>The King:</b> beat the Baroness to reach the Udder Throne, where King Cudsworth fights in three phases. Watch for his royal decree: three shockwaves in a row.</li>
+  </ul>
+  <div class="row2"><button id="btnReplayTut">Replay tutorial</button><button data-back="title">Back</button></div>
+</section>
+
+<section id="settings" class="screen panel" hidden aria-labelledby="setH">
+  <h2 id="setH">Settings</h2>
+  <div id="setList"></div>
+  <button data-back="auto">Done</button>
+</section>
+
+<section id="shop" class="screen panel wide" hidden aria-labelledby="shopH">
+  <h2 id="shopH">Glitter Shop</h2>
+  <p class="bal"><img class="coin big" src="img/glitter_64.png" alt="" width="34" height="34"> <b id="shopBal">0</b> Glitter</p>
+  <div id="shopTabs" role="tablist"></div>
+  <div id="shopGrid"></div>
+  <p class="fine">In-game Glitter is saved on this device only. It is not money and can't be cashed out.</p>
+  <p id="shopLinked" class="fine linkedline" hidden></p>
+  <div class="row2"><button id="btnShopToken" class="tokenbtn"><img src="img/glitter_64.png" alt="" width="24" height="24"> Create My Glitter Token</button><button id="shopBack" data-back="title">Back</button></div>
+</section>
+
+<section id="pause" class="screen panel" hidden aria-labelledby="pauseH">
+  <h2 id="pauseH">Paused</h2>
+  <button id="btnResume" data-autofocus>Resume</button>
+  <button id="btnPauseBag">Gear &amp; Bag</button>
+  <button id="btnPauseSettings">Settings</button>
+  <button id="btnQuit">Quit to Title</button>
+</section>
+
+<section id="results" class="screen panel" hidden aria-labelledby="resTitle">
+  <h2 id="resTitle">Area Cleared!</h2>
+  <p id="resSub"></p>
+  <div id="resStats"></div>
+  <div class="row2"><button id="btnNext" class="primary">Next Area</button><button id="btnRetry">Play Again</button></div>
+  <div class="row2"><button id="btnResShop">Glitter Shop</button><button id="btnResBag">Gear &amp; Bag</button></div>
+  <button id="btnMenu">Title</button>
+</section>
+
+<section id="bag" class="screen panel wide" hidden aria-labelledby="bagH">
+  <h2 id="bagH">Gear &amp; Bag</h2>
+  <div id="bagBody"></div>
+  <button id="bagBack">Back</button>
+</section>
+
+<section id="token" class="screen panel wide scrolly" hidden aria-labelledby="tokenH">
+  <div class="tokenhead"><img src="img/glitter_256.png" alt="" width="72" height="72"><div><h2 id="tokenH">Create My Glitter Token</h2><p>Your step-by-step checklist for a Solana do-it-yourself token with metadata. Progress saves on this device.</p></div></div>
+  <div id="tokenBody"></div>
+  <button id="tokenBack">Back</button>
+</section>
+
+<section id="wallet" class="screen panel wide scrolly" hidden aria-labelledby="walletH">
+  <h2 id="walletH">Wallet</h2>
+  <div id="walletBody"></div>
+  <button id="walletBack">Back</button>
+</section>
+
+<div id="onboard" hidden></div>
+
+<script type="module" src="./js/game.js"></script>
+</body>
+</html>
