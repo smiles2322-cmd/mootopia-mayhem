@@ -1,6 +1,6 @@
 # Moo-topia Mayhem
 
-Fight your way through a glowing night jungle overrun by rude party cows. Loot gear, collect Glitter, and follow the built-in guide to create your own Glitter token on Solana.
+Fight your way through a glowing night jungle overrun by rude party cows, all the way to King Cudsworth on the Udder Throne. Level up, cast spells, chase rainbow Ultra Rare loot, collect Glitter, and follow the built-in guide to create your own Glitter token on Solana.
 
 Play: https://smiles2322-cmd.github.io/mootopia-mayhem/
 
